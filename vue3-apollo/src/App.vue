@@ -10,13 +10,14 @@
 </template>
 
 <script>
+import { useStore } from 'vuex';
 import { useQuery, useResult } from "@vue/apollo-composable";
 import allCharacters from "./graphql/allCharacters.query.gql";
 
 export default {
   name: "App",
   setup() {
-    const { result, loading, error, refetch, onResult } = useQuery(
+    const { result, loading, error, refetch } = useQuery(
       allCharacters
     );
     const characters = useResult(
@@ -25,12 +26,10 @@ export default {
       (data) => data.characters.results
     );
 
-    onResult(() => {
-      console.log("DONE");
-    });
+    const store = useStore();
 
-    console.log(result);
-    console.log(characters);
+    store.dispatch('GET_CHARACTERS');
+
     return {
       result,
       loading,
