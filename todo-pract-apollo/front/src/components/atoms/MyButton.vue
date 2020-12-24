@@ -1,16 +1,5 @@
 <template>
-  <button @click="onClick">
+  <button>
     <slot></slot>
   </button>
 </template>
-
-<script>
-export default {
-  setup(props, { emit }) {
-    const onClick = emit("click");
-    return {
-      onClick,
-    };
-  },
-};
-</script>

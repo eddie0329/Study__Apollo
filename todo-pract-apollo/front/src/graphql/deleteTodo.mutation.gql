@@ -1,4 +1,4 @@
-mutation {
+mutation deleteTodo($id: ID!) {
   deleteTodo(id: $id) {
     id
     title

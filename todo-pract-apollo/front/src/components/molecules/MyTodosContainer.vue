@@ -5,7 +5,7 @@
     <li v-for="todo in todos" :key="todo.id">
       <CheckMark v-model="todo.isDone" />
       <TodoTitle :todo-title="todo.title" />
-      <my-button @click="onClickDelete(id)">X</my-button>
+      <my-button @click="onClickDelete(todo)">X</my-button>
     </li>
   </ul>
 </template>
@@ -26,13 +26,17 @@ export default {
     const { result, loading, error } = useQuery(allTodos);
     const todos = useResult(result, [], (data) => data.todos);
 
-    const onClickDelete = (id) => {
-      const { mutate: removeTodo } = useMutation(deleteTodo, {
-        variables: { id },
-      });
-      // useMutation(deleteTodo, { variables: { id } });
-      console.log(id);
-      removeTodo({ id });
+    const { mutate: removeTodo } = useMutation(deleteTodo);
+
+    const onClickDelete = (needRemoveTodo) => {
+      removeTodo(
+        { id: needRemoveTodo.id },
+        {
+          update: (cache) => {
+            cache.writeQuery({ query: allTodos, data: { todos: deleteTodo } });
+          },
+        }
+      );
     };
 
     return {
