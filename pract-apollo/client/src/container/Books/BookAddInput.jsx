@@ -22,15 +22,37 @@ const initialBookInputState = {
 
 export default function BookInput() {
   const [bookInfoInput, setBookInfoInput] = useState(initialBookInputState);
-  // Refecth
-  const [addBook] = useMutation(ADD_BOOK, {
-    refetchQueries: [
-      {query: BOOKS},
-      {query: AUTHORS}
-    ]
-  });
+  // Refetch
+  // const [addBook] = useMutation(ADD_BOOK, {
+  //   refetchQueries: [
+  //     {query: BOOKS},
+  //     {query: AUTHORS}
+  //   ]
+  // });
 
   // TODO: cache modify https://www.apollographql.com/docs/react/data/mutations
+  const [addBook] = useMutation(ADD_BOOK, {
+    update(cache, { data: { addBook }}) {
+      cache.modify({
+        fields: {
+          books(existingBooks = []) {
+            const newBooksRef = cache.writeQuery({
+              data: addBook,
+              fragment: gql`
+                fragment NewBook on Book {
+                    title
+                    author {
+                        name
+                    }
+                }
+              `
+            })
+            return [...existingBooks, newBooksRef];
+          }
+        }
+      });
+    }
+  });
 
   const initInput = () => {
     setBookInfoInput(initialBookInputState);
